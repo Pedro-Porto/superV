@@ -1,9 +1,9 @@
 #include "data_text.hpp"
 
-Text::Text(std::string text, std::function<void()> toggleVisibility, std::function<void(int)> removeItem)
-    : _text(text), toggleVisibility(toggleVisibility), removeItem(removeItem) {
+Text::Text(std::string text, std::string type, std::function<void()> toggleVisibility, std::function<void(int)> removeItem)
+    : _text(text), _type(type), toggleVisibility(toggleVisibility), removeItem(removeItem) {
 
-    event_box = Gtk::make_managed<Gtk::EventBox>();
+    event_box = new Gtk::EventBox();
     event_box->set_size_request(200, 100);
     event_box->get_style_context()->add_class("list-row");
 
@@ -74,4 +74,11 @@ bool Text::paste(GdkEventButton*) {
         XCloseDisplay(display);
     }, 50);
     return true;
+}
+
+Text::~Text() {
+    if (event_box) {
+        delete event_box;
+        event_box = nullptr;
+    }
 }

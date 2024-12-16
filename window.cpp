@@ -78,7 +78,6 @@ void MainWindow::updateItems(HistoryManipulator *history) {
     std::cout << "Updating items..." << std::endl;
     box.foreach([&](Gtk::Widget& child) {
         box.remove(child);
-        delete &child;
     });
     std::cout << "Removed all children" << std::endl;
     for (auto it = history->history.rbegin(); it != history->history.rend(); ++it) { // reverse loop

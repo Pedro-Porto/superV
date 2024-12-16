@@ -14,13 +14,14 @@
 
 class Image : public Data {
    public:
-    Image(std::vector<unsigned char> imageData, std::function<void()> toggleVisibility, std::function<void(int)> removeItem);
+    Image(std::vector<unsigned char> imageData, std::string type, std::function<void()> toggleVisibility, std::function<void(int)> removeItem);
+    ~Image() override;
     bool paste(GdkEventButton* event);
-    Gtk::EventBox *event_box;
     void setIndex(int index) override { this->index = index; };
     int getIndex() override { return this->index; };
     private:
     std::vector<unsigned char> _imageData;
+    std::string _type;
     std::function<void()> toggleVisibility;
     std::function<void(int)> removeItem;
     int index;

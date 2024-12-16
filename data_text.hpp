@@ -11,15 +11,16 @@
 
 #include "data.hpp"
 
-class Text : Data {
+class Text : public Data {
    public:
-    Text(std::string text, std::function<void()> toggleVisibility, std::function<void(int)> removeItem);
+    Text(std::string text, std::string type, std::function<void()> toggleVisibility, std::function<void(int)> removeItem);
+    ~Text() override;
     bool paste(GdkEventButton* event);
-    Gtk::EventBox *event_box;
     void setIndex(int index) override { this->index = index; };
     int getIndex() override { return this->index; };
    private:
     std::string _text;
+    std::string _type;
     std::function<void()> toggleVisibility;
     std::function<void(int)> removeItem;
     std::string cleanText();

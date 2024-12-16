@@ -47,17 +47,22 @@ int main(int argc, char* argv[]) {
 
     auto topBarWindow = std::make_unique<TopBarWindow>(toggleOverlay);
 
-    auto onCopy = [&history](const std::string& content) {
-        std::cout << "Clipboard: " << content << std::endl;
-        history.add(content);
-    };
+
 
     toggleDispatcher.connect([&]() {
         std::lock_guard<std::mutex> lock(stateMutex);
         mainWindow.toggleVisibility();
     });
 
-    ClipboardListener clipboardListener(onCopy, keepRunning);
+    ClipboardListener clipboardListener(
+    [&history](const std::variant<std::string, std::vector<unsigned char>> content, const std::string type) {
+        if (std::holds_alternative<std::string>(content)) {
+            history.add(std::get<std::string>(content), type);
+        } else if (std::holds_alternative<std::vector<unsigned char>>(content)) {
+            history.add(std::get<std::vector<unsigned char>>(content), type);
+        }
+    },
+    keepRunning);
 
     std::thread clipboardThread([&]() {
         while (keepRunning) {

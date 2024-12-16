@@ -11,9 +11,10 @@ class MainWindow; // foward declaration
 class HistoryManipulator {
     public:
     HistoryManipulator(MainWindow *window) : window(window) {};
-    void add(std::string text);
+    void add(const std::string text, const std::string type);
+    void add(const std::vector<unsigned char> imageData, const std::string type);
     void remove(int index);
-    list<Text*> history;
+    list<Data*> history;
     private:
     MainWindow *window;
 };
