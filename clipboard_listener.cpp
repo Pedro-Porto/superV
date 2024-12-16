@@ -1,0 +1,95 @@
+#include "clipboard_listener.hpp"
+#include <X11/Xatom.h>
+#include <iostream>
+#include <cassert>
+#include <cstring>
+#include <limits.h>
+
+// https://stackoverflow.com/questions/8755471/x11-wait-for-and-get-clipboard-text
+
+
+ClipboardListener::ClipboardListener(std::function<void(const std::string&)> callback, std::atomic<bool>& flag)
+    : onCopyCallback(callback), runningFlag(flag) {}
+
+ClipboardListener::~ClipboardListener() {}
+
+bool ClipboardListener::printSelection(Display* display, Window window, const char* bufname, const char* fmtname) {
+    char* result;
+    unsigned long ressize, restail;
+    int resbits;
+    Atom bufid = XInternAtom(display, bufname, False),
+         fmtid = XInternAtom(display, fmtname, False),
+         propid = XInternAtom(display, "XSEL_DATA", False),
+         incrid = XInternAtom(display, "INCR", False);
+    XEvent event;
+
+    XSelectInput(display, window, PropertyChangeMask);
+    XConvertSelection(display, bufid, fmtid, propid, window, CurrentTime);
+    do {
+        XNextEvent(display, &event);
+    } while (event.type != SelectionNotify || event.xselection.selection != bufid);
+
+    if (event.xselection.property) {
+        XGetWindowProperty(display, window, propid, 0, LONG_MAX / 4, True, AnyPropertyType,
+                           &fmtid, &resbits, &ressize, &restail, (unsigned char**)&result);
+        if (fmtid != incrid) {
+            std::string content(result, ressize);
+            XFree(result);
+            onCopyCallback(content);
+        }
+
+        if (fmtid == incrid) {
+            do {
+                do {
+                    XNextEvent(display, &event);
+                } while (event.type != PropertyNotify || event.xproperty.atom != propid ||
+                         event.xproperty.state != PropertyNewValue);
+
+                XGetWindowProperty(display, window, propid, 0, LONG_MAX / 4, True, AnyPropertyType,
+                                   &fmtid, &resbits, &ressize, &restail, (unsigned char**)&result);
+                std::string content(result, ressize);
+                XFree(result);
+                onCopyCallback(content);
+            } while (ressize > 0);
+        }
+        return true;
+    }
+    return false;
+}
+
+void ClipboardListener::watchSelection(Display* display, Window window, const char* bufname) {
+    int event_base, error_base;
+    XEvent event;
+    Atom bufid = XInternAtom(display, bufname, False);
+
+    assert(XFixesQueryExtension(display, &event_base, &error_base));
+    XFixesSelectSelectionInput(display, DefaultRootWindow(display), bufid, XFixesSetSelectionOwnerNotifyMask);
+
+    while (runningFlag) {
+        XNextEvent(display, &event);
+
+        if (event.type == event_base + XFixesSelectionNotify &&
+            ((XFixesSelectionNotifyEvent*)&event)->selection == bufid) {
+            if (!printSelection(display, window, bufname, "UTF8_STRING")) {
+                printSelection(display, window, bufname, "STRING");
+            }
+        }
+    }
+}
+
+void ClipboardListener::start() {
+    Display* display = XOpenDisplay(nullptr);
+    if (!display) {
+        std::cerr << "X11 not available" << std::endl;
+        return;
+    }
+
+    unsigned long color = BlackPixel(display, DefaultScreen(display));
+    Window window = XCreateSimpleWindow(display, DefaultRootWindow(display), 0, 0, 1, 1, 0, color, color);
+
+    watchSelection(display, window, "CLIPBOARD");
+
+    XDestroyWindow(display, window);
+    XCloseDisplay(display);
+}
+
