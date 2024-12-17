@@ -80,8 +80,8 @@ void MainWindow::updateItems(HistoryManipulator *history) {
         box.remove(child);
     });
     std::cout << "Removed all children" << std::endl;
-    for (auto it = history->history.rbegin(); it != history->history.rend(); ++it) { // reverse loop
-        box.pack_start(*(*it)->event_box, Gtk::PACK_SHRINK);
+    for (auto it = history->getHistory().rbegin(); it != history->getHistory().rend(); ++it) { // reverse loop
+        box.pack_start(*(*it)->getEventBox(), Gtk::PACK_SHRINK);
     }
     std::cout << "Packed all children" << std::endl;
     show_all_children();

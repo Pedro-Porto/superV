@@ -5,21 +5,28 @@
 #include <X11/Xlib.h>
 #include <X11/extensions/XTest.h>
 #include <X11/keysym.h>
-#include <thread>
-#include <chrono>
 
+#include <chrono>
 #include <iostream>
+#include <thread>
 
 #include "data.hpp"
 
 class Image : public Data {
    public:
-    Image(std::vector<unsigned char> imageData, std::string type, std::function<void()> toggleVisibility, std::function<void(int)> removeItem);
+    Image(std::vector<unsigned char> imageData, std::string type,
+          std::function<void()> toggleVisibility,
+          std::function<void(int)> removeItem);
     ~Image() override;
-    bool paste(GdkEventButton* event);
+    bool paste(GdkEventButton *event);
     void setIndex(int index) override { this->index = index; };
-    int getIndex() override { return this->index; };
-    private:
+    int getIndex() const override { return this->index; };
+    std::vector<unsigned char> *getContent() { return &_imageData; };
+    const std::string& getType() const override { return _type; };
+    Gtk::EventBox *getEventBox() const override { return event_box; };
+
+   private:
+    Gtk::EventBox *event_box;
     std::vector<unsigned char> _imageData;
     std::string _type;
     std::function<void()> toggleVisibility;

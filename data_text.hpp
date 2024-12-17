@@ -17,8 +17,12 @@ class Text : public Data {
     ~Text() override;
     bool paste(GdkEventButton* event);
     void setIndex(int index) override { this->index = index; };
-    int getIndex() override { return this->index; };
+    int getIndex() const override { return this->index; };
+    const std::string& getContent() const { return _text; };
+    const std::string& getType() const override { return _type; };
+    Gtk::EventBox *getEventBox() const override { return event_box; };
    private:
+    Gtk::EventBox *event_box;
     std::string _text;
     std::string _type;
     std::function<void()> toggleVisibility;

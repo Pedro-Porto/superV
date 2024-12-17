@@ -11,8 +11,9 @@ class Data {  // abstract class
     virtual bool paste(GdkEventButton* event) = 0;
     virtual ~Data() = default;
     virtual void setIndex(int index) = 0;
-    virtual int getIndex() = 0;
-    Gtk::EventBox *event_box;
+    virtual int getIndex() const = 0;
+    virtual const std::string& getType() const = 0;
+    virtual Gtk::EventBox *getEventBox() const = 0;
 };
 
 #endif // DATA_HPP

@@ -13,6 +13,8 @@
 #include "history_manipulator.hpp"
 #include "topbar_window.hpp"
 #include "window.hpp"
+#include "save_history.hpp"
+#include "save_config.hpp"
 
 std::atomic<bool> keepRunning(true);
 Glib::Dispatcher toggleDispatcher;
@@ -31,6 +33,16 @@ void signalHandler(int) {
 int main(int argc, char* argv[]) {
     std::signal(SIGINT, signalHandler);
 
+    SaveConfig config("superv.conf");
+
+    bool saveToHistory = config.load("SAVE_HISTORY") == "true";
+
+    if (saveToHistory) {
+        std::cout << "Saving history to file" << std::endl;
+    } else {
+        std::cout << "Not saving history to file" << std::endl;
+    }
+
     auto app = Gtk::Application::create(argc, argv, "org.example.overlay");
 
     Gtk::Window dummyWindow;
@@ -42,6 +54,12 @@ int main(int argc, char* argv[]) {
     MainWindow mainWindow;
 
     HistoryManipulator history(&mainWindow);
+
+    SaveHistory saveHistory("history.bin", history);
+
+    if (saveToHistory) {
+        saveHistory.load();
+    }
 
     auto toggleOverlay = [&mainWindow]() { mainWindow.toggleVisibility(); };
 
@@ -55,11 +73,14 @@ int main(int argc, char* argv[]) {
     });
 
     ClipboardListener clipboardListener(
-    [&history](const std::variant<std::string, std::vector<unsigned char>> content, const std::string type) {
+    [&history, &saveToHistory, &saveHistory](const std::variant<std::string, std::vector<unsigned char>> content, const std::string type) {
         if (std::holds_alternative<std::string>(content)) {
             history.add(std::get<std::string>(content), type);
         } else if (std::holds_alternative<std::vector<unsigned char>>(content)) {
             history.add(std::get<std::vector<unsigned char>>(content), type);
+        }
+        if (saveToHistory) {
+            saveHistory.save();
         }
     },
     keepRunning);
