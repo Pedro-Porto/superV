@@ -5,11 +5,10 @@
 #include <iostream>
 #include <cstring>
 
-#define SOCKET_PATH "/tmp/global_listener_socket"
 void globalListener(std::function<void()> callback, std::atomic<bool>& runningFlag, std::string socketPath) {
     int server_fd = socket(AF_UNIX, SOCK_STREAM, 0);
     if (server_fd == -1) {
-        perror("Erro ao criar o socket");
+        std::cerr << "Socket creation error" << std::endl;
         return;
     }
 
@@ -19,29 +18,25 @@ void globalListener(std::function<void()> callback, std::atomic<bool>& runningFl
     unlink(socketPath.c_str());
 
     if (bind(server_fd, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) == -1) {
-        perror("Erro ao associar o socket");
+        std::cerr << "Socket bind error" << std::endl;
         close(server_fd);
         return;
     }
 
     if (listen(server_fd, 5) == -1) {
-        perror("Erro ao escutar no socket");
+        std::cerr << "Socket listen error" << std::endl;
         close(server_fd);
         unlink(socketPath.c_str());
         return;
     }
 
-    std::cout << "Global listener ativo no socket: " << socketPath << std::endl;
-
     while (runningFlag) {
         int client_fd = accept(server_fd, nullptr, nullptr);
         if (client_fd == -1) {
             if (!runningFlag) break;
-            perror("Erro ao aceitar conexão no socket");
+            std::cerr << "Socket conn error" << std::endl;
             continue;
         }
-
-        std::cout << "Conexão recebida no socket!" << std::endl;
 
         char buffer[256];
         int bytes_read = read(client_fd, buffer, sizeof(buffer) - 1);
@@ -51,16 +46,10 @@ void globalListener(std::function<void()> callback, std::atomic<bool>& runningFl
 
             command.erase(command.find_last_not_of(" \n\r\t") + 1);
 
-            std::cout << "Mensagem recebida: [" << command << "]" << std::endl;
-
             if (command == "trigger") {
-                std::cout << "Chamando o callback..." << std::endl;
+                std::cout << "socket callback" << std::endl;
                 callback();
-            } else {
-                std::cerr << "Comando não reconhecido: [" << command << "]" << std::endl;
             }
-        } else {
-            std::cerr << "Nada lido do cliente ou erro!" << std::endl;
         }
 
         close(client_fd);
@@ -68,7 +57,7 @@ void globalListener(std::function<void()> callback, std::atomic<bool>& runningFl
 
     close(server_fd);
     unlink(socketPath.c_str());
-    std::cout << "Global listener encerrado." << std::endl;
+    std::cout << "Global listener shutdown" << std::endl;
 }
 
 void stopListener(std::string socketPath) {

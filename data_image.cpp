@@ -1,6 +1,15 @@
 #include "data_image.hpp"
 #include "keyboard_emulator.hpp"
 
+/**
+ * @brief Construct a new Image:: Image object
+ * 
+ * Creates a event box with the image and a delete button to add to the interface
+ * @param imageData The image data - vector of unsigned char
+ * @param type The image type
+ * @param toggleVisibility Function to toggle the visibility of the main window
+ * @param removeItem Function to remove the item from the history
+ */
 Image::Image(std::vector<unsigned char> imageData, std::string type,
              std::function<void()> toggleVisibility,
              std::function<void(int)> removeItem)
@@ -63,6 +72,11 @@ Image::Image(std::vector<unsigned char> imageData, std::string type,
         sigc::mem_fun(*this, &Image::paste));
 }
 
+/**
+ * @brief Paste the image to the clipboard
+ * 
+ * Uses Gtk Clipboard to add the image to the clipboard
+ */
 bool Image::paste(GdkEventButton*) {
     try {
         auto loader = Gdk::PixbufLoader::create();

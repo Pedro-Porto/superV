@@ -14,6 +14,7 @@ class Data {  // abstract class
     virtual int getIndex() const = 0;
     virtual const std::string& getType() const = 0;
     virtual Gtk::EventBox *getEventBox() const = 0;
+    virtual bool operator==(int index) const = 0;
 };
 
 #endif // DATA_HPP

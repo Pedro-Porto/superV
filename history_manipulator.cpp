@@ -1,8 +1,10 @@
 #include "history_manipulator.hpp"
-
+#include "save_history.hpp"
 #include "data_image.hpp"
 #include "data_text.hpp"
 #include "window.hpp"
+
+HistoryManipulator::HistoryManipulator(MainWindow *window, SaveHistory *saveHistory) : saveHistory(saveHistory), window(window){};
 
 void HistoryManipulator::add(const std::string text, const std::string type) {
     cout << "Clipboard: (" << type << ") " << text << endl;
@@ -39,7 +41,7 @@ void HistoryManipulator::remove(int index) {
 
     auto it =
         std::remove_if(history.begin(), history.end(), [index](auto* item) {
-            if (item->getIndex() == index) {
+            if (*item == index) {
                 delete item;
                 return true;
             }
@@ -53,7 +55,7 @@ void HistoryManipulator::remove(int index) {
             item->setIndex(item->getIndex() - 1);
         }
     }
-
+    saveHistory->save(*this);
     window->updateItems(this);
 }
 
@@ -63,4 +65,9 @@ void HistoryManipulator::cropData() {
         std::advance(it, history.size() - 20);
         history.erase(history.begin(), it);
     }
+}
+
+HistoryManipulator& HistoryManipulator::operator=(SaveHistory& saveHistory) {
+    saveHistory.load(*this);
+    return *this;
 }

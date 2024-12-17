@@ -64,12 +64,12 @@ int main(int argc, char* argv[]) {
 
     MainWindow mainWindow;
 
-    HistoryManipulator history(&mainWindow);
+    SaveHistory saveHistory(path + "/history.bin");
 
-    SaveHistory saveHistory(path + "/history.bin", history);
+    HistoryManipulator history(&mainWindow, &saveHistory);
 
     if (saveToHistory) {
-        saveHistory.load();
+        history = saveHistory;
     }
 
     auto toggleOverlay = [&mainWindow]() { mainWindow.toggleVisibility(); };
@@ -91,7 +91,7 @@ int main(int argc, char* argv[]) {
             history.add(std::get<std::vector<unsigned char>>(content), type);
         }
         if (saveToHistory) {
-            saveHistory.save();
+            saveHistory = history;
         }
     },
     keepRunning);

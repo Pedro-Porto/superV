@@ -1,9 +1,10 @@
 #include "save_history.hpp"
+#include "history_manipulator.hpp"
 
-SaveHistory::SaveHistory(std::string filename, HistoryManipulator& history)
-    : _filename(filename), _history(history) {}
+SaveHistory::SaveHistory(std::string filename)
+    : _filename(filename) {}
 
-void SaveHistory::save() {
+void SaveHistory::save(HistoryManipulator& history) {
     std::ofstream file(_filename, std::ios::out);
 
     if (!file) {
@@ -11,7 +12,7 @@ void SaveHistory::save() {
         return;
     }
 
-    for (auto& h : _history.getHistory()) {
+    for (auto& h : history.getHistory()) {
         if (auto text = dynamic_cast<Text*>(h)) {
             file << text->getType().size() << text->getType()
                  << text->getContent().size() << text->getContent();
@@ -24,7 +25,7 @@ void SaveHistory::save() {
     file.close();
 }
 
-void SaveHistory::load() {
+void SaveHistory::load(HistoryManipulator& history) {
     std::ifstream file(_filename, std::ios::in);
 
     if (!file) {
@@ -48,15 +49,20 @@ void SaveHistory::load() {
         file.read(&content[0], contentSize);
 
         if (type == "UTF8_STRING" || type == "STRING") {
-            _history.add(content, type);
+            history.add(content, type);
         } else {
-            _history.add(
+            history.add(
                 std::vector<unsigned char>(content.begin(), content.end()),
                 type);
         }
     }
 
     file.close();
+}
+
+SaveHistory& SaveHistory::operator=(HistoryManipulator& history) {
+    save(history);
+    return *this;
 }
 
 void SaveHistory::deleteFile() { std::remove(_filename.c_str()); }

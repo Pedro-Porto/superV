@@ -8,6 +8,12 @@
 #include <functional>
 #include <string>
 
+/**
+ * Runs in a separate thread and listens to clipboard changes.
+ * When a change is detected, it calls the callback function with the content and type of the clipboard.
+ * The callback function should be able to handle both text and image data.
+ * It uses X11 to listen to clipboard changes - so it only works on xorg or xwayland.
+ */
 class ClipboardListener {
 public:
     ClipboardListener(std::function<void(const std::variant<std::string, std::vector<unsigned char>>, const std::string)> callback, std::atomic<bool>& runningFlag);
