@@ -44,7 +44,7 @@ bool wait_for_device(const char* device_path, int timeout_ms) {
 void ctrlV() { // kernel level keyboard simulation
     int fd = open("/dev/uinput", O_WRONLY | O_NONBLOCK);
     if (fd < 0) {
-        std::cerr << "Erro ao abrir /dev/uinput" << std::endl;
+        std::cerr << "error opening /dev/uinput" << std::endl;
         return;
     }
 
@@ -77,5 +77,5 @@ void ctrlV() { // kernel level keyboard simulation
     ioctl(fd, UI_DEV_DESTROY);
     close(fd);
 
-    std::cout << "Ctrl + V simulado com sucesso!" << std::endl;
+    std::cout << "Ctrl + V" << std::endl;
 }

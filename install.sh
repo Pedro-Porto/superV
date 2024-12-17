@@ -95,6 +95,8 @@ mkdir -p ~/.config/systemd/user
 
 SERVICE_FILE="$HOME/.config/systemd/user/superv.service"
 
+sudo chmod 666 /dev/uinput
+
 cat <<EOF > "$SERVICE_FILE"
 [Unit]
 Description=SuperV Program Service
@@ -124,3 +126,4 @@ echo "Checking service status..."
 systemctl --user status superv
 
 echo "Service setup complete!"
+ Service
