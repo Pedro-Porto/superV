@@ -7,6 +7,11 @@
 #include <string>
 class HistoryManipulator;  // foward declaration
 
+/**
+ * @brief Class to create the main window
+ * 
+ * This class is used to create the main window of the application
+ */
 class MainWindow : public Gtk::Window {
    public:
     MainWindow();

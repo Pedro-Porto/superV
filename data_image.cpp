@@ -103,6 +103,11 @@ bool Image::paste(GdkEventButton*) {
     }
 }
 
+/**
+ * @brief Destroy the Image:: Image object
+ * 
+ * Deletes the event box
+ */
 Image::~Image() {
     if (event_box) {
         delete event_box;

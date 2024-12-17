@@ -1,6 +1,11 @@
 #include "window.hpp"
 #include "history_manipulator.hpp"
 
+/**
+ * @brief Construct a new Main Window:: Main Window object
+ * 
+ * Creates the main window with all the styles
+ */
 MainWindow::MainWindow() {
     set_app_paintable(true);
     auto screen1 = get_screen();
@@ -61,11 +66,21 @@ MainWindow::MainWindow() {
     hide();
 }
 
+/**
+ * @brief Callback for when the window loses focus (user clicks outside the window)
+ * 
+ * @param event The focus event
+ * @return true
+ */
 bool MainWindow::onLostFocus(GdkEventFocus*) {
     hide();
     return false;
 }
 
+/**
+ * @brief Toggles the visibility of the window
+ * 
+ */
 void MainWindow::toggleVisibility() {
     if (is_visible()) {
         hide();
@@ -74,15 +89,17 @@ void MainWindow::toggleVisibility() {
     }
 }
 
+/**
+ * @brief Updates the items in the history
+ * 
+ * @param history The history to be updated
+ */
 void MainWindow::updateItems(HistoryManipulator *history) {
-    std::cout << "Updating items..." << std::endl;
     box.foreach([&](Gtk::Widget& child) {
         box.remove(child);
     });
-    std::cout << "Removed all children" << std::endl;
     for (auto it = history->getHistory().rbegin(); it != history->getHistory().rend(); ++it) { // reverse loop
         box.pack_start(*(*it)->getEventBox(), Gtk::PACK_SHRINK);
     }
-    std::cout << "Packed all children" << std::endl;
     show_all_children();
 }

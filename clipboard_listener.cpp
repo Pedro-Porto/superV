@@ -9,8 +9,10 @@
 #include <iostream>
 #include <thread>
 
-// https://stackoverflow.com/questions/8755471/x11-wait-for-and-get-clipboard-text
-
+/**
+ * @brief Construct a new Clipboard Listener:: Clipboard Listener object
+ * source for implementation: https://stackoverflow.com/questions/8755471/x11-wait-for-and-get-clipboard-text
+ */
 ClipboardListener::ClipboardListener(
     std::function<
         void(const std::variant<std::string, std::vector<unsigned char>>,
@@ -21,6 +23,9 @@ ClipboardListener::ClipboardListener(
 
 ClipboardListener::~ClipboardListener() {}
 
+/**
+ * @brief Prints the selection to the callback function
+ */
 bool ClipboardListener::printSelection(Display* display, Window window,
                                        const char* bufname,
                                        const char* fmtname) {
@@ -88,6 +93,11 @@ bool ClipboardListener::printSelection(Display* display, Window window,
     return false;
 }
 
+/**
+ * @brief Watches the selection
+ * If there is a change in the selection, it calls printSelection
+ * Must run in a separate thread (or it will block the main thread)
+ */
 void ClipboardListener::watchSelection(Display* display, Window window,
                                        const char* bufname) {
     int event_base, error_base;
@@ -111,12 +121,15 @@ void ClipboardListener::watchSelection(Display* display, Window window,
                 }
             }
         } else {
-            // Pequeno delay para evitar loop intenso
+            // delay to avoid high CPU usage
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
     }
 }
 
+/**
+ * @brief Starts the clipboard listener
+ */
 void ClipboardListener::start() {
     Display* display = XOpenDisplay(nullptr);
     if (!display) {

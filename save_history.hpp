@@ -7,6 +7,11 @@
 
 class HistoryManipulator; // foward declaration
 
+/**
+ * @brief Class to save and load history
+ * 
+ * This class is used to save and load history to a file
+ */
 class SaveHistory {
    public:
     SaveHistory(std::string filename);

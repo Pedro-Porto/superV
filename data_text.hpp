@@ -5,6 +5,11 @@
 
 #include "data.hpp"
 
+/**
+ * @brief Text data class
+ * 
+ * Inherits from Data class
+ */
 class Text : public Data {
    public:
     Text(std::string text, std::string type, std::function<void()> toggleVisibility, std::function<void(int)> removeItem);

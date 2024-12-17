@@ -10,6 +10,11 @@
 class MainWindow;  // foward declaration
 class SaveHistory; // foward declaration
 
+/**
+ * @brief Class to manipulate the history
+ * 
+ * This class is responsible for adding and removing items from the history
+ */
 class HistoryManipulator {
    public:
     HistoryManipulator(MainWindow *window, SaveHistory *saveHistory);

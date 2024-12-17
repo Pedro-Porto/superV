@@ -4,7 +4,12 @@
 
 SaveConfig::SaveConfig(std::string filename) : _filename(filename) {}
 
-
+/**
+ * @brief Save a configuration value to a file
+ * 
+ * @param name The name of the configuration
+ * @param value The value of the configuration
+ */
 void SaveConfig::save(std::string name, std::string value) {
     std::ofstream file(_filename, std::ios::out);
     if (!file) {
@@ -15,6 +20,12 @@ void SaveConfig::save(std::string name, std::string value) {
     file.close();
 }
 
+/**
+ * @brief Load a configuration value from a file
+ * 
+ * @param name The name of the configuration
+ * @return std::string The value of the configuration
+ */
 std::string SaveConfig::load(std::string name) {
     std::ifstream file(_filename);
     if (!file) {

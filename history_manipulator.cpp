@@ -6,6 +6,12 @@
 
 HistoryManipulator::HistoryManipulator(MainWindow *window, SaveHistory *saveHistory) : saveHistory(saveHistory), window(window){};
 
+/**
+ * @brief Adds a text to the history
+ * 
+ * @param text The text to be added
+ * @param type The text type
+ */
 void HistoryManipulator::add(const std::string text, const std::string type) {
     cout << "Clipboard: (" << type << ") " << text << endl;
     auto text_data = new Text(
@@ -19,6 +25,12 @@ void HistoryManipulator::add(const std::string text, const std::string type) {
     window->updateItems(this);
 }
 
+/**
+ * @brief Adds an image to the history
+ * 
+ * @param imageData The image data
+ * @param type The image type
+ */
 void HistoryManipulator::add(const std::vector<unsigned char> imageData,
                              const std::string type) {
     std::cout << "Clipboard: (" << type << ") " << imageData.size() << " bytes"
@@ -34,6 +46,11 @@ void HistoryManipulator::add(const std::vector<unsigned char> imageData,
     window->updateItems(this);
 }
 
+/**
+ * @brief Removes an item from the history based on the index
+ * 
+ * @param index The index of the item to be removed
+ */
 void HistoryManipulator::remove(int index) {
     if (index < 0 || static_cast<size_t>(index) >= history.size()) {
         return;
@@ -59,6 +76,9 @@ void HistoryManipulator::remove(int index) {
     window->updateItems(this);
 }
 
+/**
+ * @brief Crops the history to keep only the last 20 items
+ */
 void HistoryManipulator::cropData() {
     if (history.size() > 20) {
         auto it = history.begin();
@@ -67,6 +87,12 @@ void HistoryManipulator::cropData() {
     }
 }
 
+/**
+ * @brief Overload of the assignment operator
+ * 
+ * @param saveHistory The SaveHistory object to be assigned
+ * @return HistoryManipulator& The assigned object
+ */
 HistoryManipulator& HistoryManipulator::operator=(SaveHistory& saveHistory) {
     saveHistory.load(*this);
     return *this;

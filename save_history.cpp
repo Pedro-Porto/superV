@@ -4,6 +4,11 @@
 SaveHistory::SaveHistory(std::string filename)
     : _filename(filename) {}
 
+/**
+ * @brief Saves the history to a file
+ * 
+ * @param history The history to be saved
+ */
 void SaveHistory::save(HistoryManipulator& history) {
     std::ofstream file(_filename, std::ios::out);
 
@@ -25,6 +30,11 @@ void SaveHistory::save(HistoryManipulator& history) {
     file.close();
 }
 
+/**
+ * @brief Loads the history from a file
+ * 
+ * @param history The history to be loaded
+ */
 void SaveHistory::load(HistoryManipulator& history) {
     std::ifstream file(_filename, std::ios::in);
 
@@ -60,6 +70,12 @@ void SaveHistory::load(HistoryManipulator& history) {
     file.close();
 }
 
+/**
+ * @brief Overload of the assignment operator
+ * 
+ * @param history The history to be saved
+ * @return SaveHistory& 
+ */
 SaveHistory& SaveHistory::operator=(HistoryManipulator& history) {
     save(history);
     return *this;

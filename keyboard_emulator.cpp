@@ -1,5 +1,8 @@
 #include "keyboard_emulator.hpp"
 
+/**
+ * @brief Sends a key event to the uinput device
+ */
 void sendKey(int fd, int keycode, bool press) {
     struct input_event ev;
     memset(&ev, 0, sizeof(ev));
@@ -15,6 +18,9 @@ void sendKey(int fd, int keycode, bool press) {
     write(fd, &ev, sizeof(ev));
 }
 
+/**
+ * @brief Waits for the device to be created
+ */
 bool wait_for_device(const char* device_path, int timeout_ms) {
     struct stat buffer;
     int elapsed = 0;
@@ -29,6 +35,12 @@ bool wait_for_device(const char* device_path, int timeout_ms) {
     return false;
 }
 
+/**
+ * @brief Simulates a Ctrl + V key press
+ * 
+ * This function simulates a Ctrl + V key press by creating a uinput device and sending the key events.
+ * A keyboard is created at kernel level and the key events are sent to the device.
+ */
 void ctrlV() { // kernel level keyboard simulation
     int fd = open("/dev/uinput", O_WRONLY | O_NONBLOCK);
     if (fd < 0) {

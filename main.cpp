@@ -20,7 +20,7 @@ std::atomic<bool> keepRunning(true);
 Glib::Dispatcher toggleDispatcher;
 std::mutex stateMutex;
 
-void signalHandler(int) {
+void signalHandler(int) { // when user preses ctrl+c on terminal
     std::cout << "\nGraceful shutdown..." << std::endl;
     keepRunning = false;
     auto app = Gtk::Application::get_default();
@@ -36,9 +36,9 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    std::string path = argv[1];
+    std::string path = argv[1]; // path to save files
 
-    if (!path.empty() && path.back() == '/') path.erase(path.size() - 1);
+    if (!path.empty() && path.back() == '/') path.erase(path.size() - 1); // remove trailing slash
 
     std::string socketPath = path + "/global_listener_socket";
 
@@ -46,7 +46,7 @@ int main(int argc, char* argv[]) {
 
     SaveConfig config(path + "/superv.conf");
 
-    bool saveToHistory = config.load("SAVE_HISTORY") == "true";
+    bool saveToHistory = config.load("SAVE_HISTORY") == "true"; // load history config
 
     if (saveToHistory) {
         std::cout << "Saving history to file" << std::endl;
@@ -129,6 +129,7 @@ int main(int argc, char* argv[]) {
 
         stopListener(socketPath);
 
+        // waits for threads to finish
         if (globalKeyListenerThread.joinable()) {
             globalKeyListenerThread.join();
         }

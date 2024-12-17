@@ -41,13 +41,13 @@ done
 if [ "$flag_d" = false ]; then
     echo "Installing dependencies..."
     sudo apt update
-    sudo apt install libgtkmm-3.0-dev libayatana-appindicator3-dev libx11-dev libxfixes-dev libxtst-dev
+    sudo apt install libgtkmm-3.0-dev libayatana-appindicator3-dev libx11-dev libxfixes-dev libxtst-dev libcairomm-1.0-dev
 fi
 
 
 
 echo "Checking system packages..."
-required_pkgs=("libgtkmm-3.0-dev" "libayatana-appindicator3-dev" "libx11-dev" "libxfixes-dev" "libxtst-dev")
+required_pkgs=("libgtkmm-3.0-dev" "libayatana-appindicator3-dev" "libx11-dev" "libxfixes-dev" "libxtst-dev" "libcairomm-1.0-dev")
 
 for pkg in "${required_pkgs[@]}"; do
     if dpkg -l | grep -q "$pkg"; then

@@ -1,5 +1,10 @@
 #include <string>
 
+/**
+ * @brief Class to save and load configuration values
+ * 
+ * This class is used to save and load configuration values to a file
+ */
 class SaveConfig {
    public:
     SaveConfig(std::string filename);

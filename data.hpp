@@ -6,6 +6,11 @@
 
 using namespace std;
 
+/**
+ * @brief Abstract class for data
+ * 
+ * This class is used to create a common interface for the data classes Text and Image
+ */
 class Data {  // abstract class
    public:
     virtual bool paste(GdkEventButton* event) = 0;

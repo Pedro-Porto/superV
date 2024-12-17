@@ -1,6 +1,15 @@
 #include "data_text.hpp"
 #include "keyboard_emulator.hpp"
 
+/**
+ * @brief Construct a new Text:: Text object
+ * 
+ * Creates a event box with the text and a delete button to add to the interface
+ * @param text The text to be displayed
+ * @param type The text type
+ * @param toggleVisibility Function to toggle the visibility of the main window
+ * @param removeItem Function to remove the item from the history
+ */
 Text::Text(std::string text, std::string type, std::function<void()> toggleVisibility, std::function<void(int)> removeItem)
     : _text(text), _type(type), toggleVisibility(toggleVisibility), removeItem(removeItem) {
 
@@ -44,6 +53,11 @@ Text::Text(std::string text, std::string type, std::function<void()> toggleVisib
     );
 }
 
+/**
+ * @brief Cleans the text from new lines
+ * 
+ * @return std::string The cleaned text
+ */
 std::string Text::cleanText() {
     std::string cleanText = _text;
     cleanText.erase(std::remove(cleanText.begin(), cleanText.end(), '\n'), cleanText.end());
@@ -65,6 +79,10 @@ bool Text::paste(GdkEventButton*) {
     return true;
 }
 
+/**
+ * @brief Destroy the Text:: Text object
+ * 
+ */
 Text::~Text() {
     if (event_box) {
         delete event_box;

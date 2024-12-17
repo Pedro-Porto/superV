@@ -11,7 +11,11 @@
 #include <thread>
 
 #include "data.hpp"
-
+/**
+ * @brief Image data class
+ * 
+ * Inherits from Data class
+ */
 class Image : public Data {
    public:
     Image(std::vector<unsigned char> imageData, std::string type,

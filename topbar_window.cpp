@@ -21,6 +21,12 @@ void TopBarWindow::setupIndicator() {
     app_indicator_set_status(indicator, APP_INDICATOR_STATUS_ACTIVE);
     setupMenu();
 }
+
+/**
+ * @brief Setup the menu for the indicator
+ * 
+ * Adds the menu items to the indicator on the topbar
+ */
 void TopBarWindow::setupMenu() {
     auto toggle_overlay_item = Gtk::make_managed<Gtk::MenuItem>("Toggle Overlay");
     toggle_overlay_item->signal_activate().connect([this]() {

@@ -5,6 +5,15 @@
 #include <iostream>
 #include <cstring>
 
+/**
+ * @brief Listens to a socket for a "trigger" message.
+ * 
+ * When the message is received, it calls the callback function.
+ * 
+ * @param callback Function to be called when the message is received.
+ * @param runningFlag Flag to stop the listener.
+ * @param socketPath Path to the socket file.
+ */
 void globalListener(std::function<void()> callback, std::atomic<bool>& runningFlag, std::string socketPath) {
     int server_fd = socket(AF_UNIX, SOCK_STREAM, 0);
     if (server_fd == -1) {
@@ -60,6 +69,11 @@ void globalListener(std::function<void()> callback, std::atomic<bool>& runningFl
     std::cout << "Global listener shutdown" << std::endl;
 }
 
+/**
+ * @brief Stops the listener by connecting to the socket.
+ * 
+ * @param socketPath Path to the socket file.
+ */
 void stopListener(std::string socketPath) {
     int client_fd = socket(AF_UNIX, SOCK_STREAM, 0);
     if (client_fd != -1) {
