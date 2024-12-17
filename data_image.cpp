@@ -1,4 +1,5 @@
 #include "data_image.hpp"
+#include "keyboard_emulator.hpp"
 
 Image::Image(std::vector<unsigned char> imageData, std::string type,
              std::function<void()> toggleVisibility,
@@ -75,29 +76,12 @@ bool Image::paste(GdkEventButton*) {
         clipboard->store();
 
         toggleVisibility();
-        Glib::signal_timeout().connect_once(
-            [this]() {
-                Display* display = XOpenDisplay(NULL);
-                if (!display) {
-                    std::cerr << "X11 not available" << std::endl;
-                    return;
-                }
 
-                XTestFakeKeyEvent(display,
-                                  XKeysymToKeycode(display, XK_Control_L), True,
-                                  CurrentTime);
-                XTestFakeKeyEvent(display, XKeysymToKeycode(display, XK_V),
-                                  True, CurrentTime);
-                XTestFakeKeyEvent(display, XKeysymToKeycode(display, XK_V),
-                                  False, CurrentTime);
-                XTestFakeKeyEvent(display,
-                                  XKeysymToKeycode(display, XK_Control_L),
-                                  False, CurrentTime);
+        removeItem(index);
 
-                XFlush(display);
-                XCloseDisplay(display);
-            },
-            50);
+        Glib::signal_timeout().connect_once([this]() {
+            ctrlV();
+        }, 50);
         return true;
     } catch (const std::exception& e) {
         std::cerr << "Error pasting image: " << e.what() << std::endl;

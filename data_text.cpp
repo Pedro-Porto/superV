@@ -1,4 +1,5 @@
 #include "data_text.hpp"
+#include "keyboard_emulator.hpp"
 
 Text::Text(std::string text, std::string type, std::function<void()> toggleVisibility, std::function<void(int)> removeItem)
     : _text(text), _type(type), toggleVisibility(toggleVisibility), removeItem(removeItem) {
@@ -49,7 +50,6 @@ std::string Text::cleanText() {
     return cleanText;
 }
 
-
 bool Text::paste(GdkEventButton*) {
     cout << "Colando: " << _text << endl;
     auto clipboard = Gtk::Clipboard::get();
@@ -57,22 +57,11 @@ bool Text::paste(GdkEventButton*) {
     clipboard->store();
 
     toggleVisibility();
+    removeItem(index);
 
     Glib::signal_timeout().connect_once([this]() {
-        Display* display = XOpenDisplay(NULL);
-        if (!display) {
-            std::cerr << "X11 not available" << std::endl;
-            return;
-        }
-
-        XTestFakeKeyEvent(display, XKeysymToKeycode(display, XK_Control_L), True, CurrentTime);
-        XTestFakeKeyEvent(display, XKeysymToKeycode(display, XK_V), True, CurrentTime);
-        XTestFakeKeyEvent(display, XKeysymToKeycode(display, XK_V), False, CurrentTime);
-        XTestFakeKeyEvent(display, XKeysymToKeycode(display, XK_Control_L), False, CurrentTime);
-
-        XFlush(display);
-        XCloseDisplay(display);
-    }, 50);
+        ctrlV();
+    }, 100);
     return true;
 }
 

@@ -24,7 +24,7 @@ class Image : public Data {
     std::vector<unsigned char> *getContent() { return &_imageData; };
     const std::string& getType() const override { return _type; };
     Gtk::EventBox *getEventBox() const override { return event_box; };
-
+      
    private:
     Gtk::EventBox *event_box;
     std::vector<unsigned char> _imageData;

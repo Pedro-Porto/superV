@@ -4,8 +4,10 @@
 #include <limits.h>
 
 #include <cassert>
+#include <chrono>
 #include <cstring>
 #include <iostream>
+#include <thread>
 
 // https://stackoverflow.com/questions/8755471/x11-wait-for-and-get-clipboard-text
 
@@ -97,15 +99,20 @@ void ClipboardListener::watchSelection(Display* display, Window window,
                                XFixesSetSelectionOwnerNotifyMask);
 
     while (runningFlag) {
-        XNextEvent(display, &event);
+        if (XPending(display)) {
+            XNextEvent(display, &event);
 
-        if (event.type == event_base + XFixesSelectionNotify &&
-            ((XFixesSelectionNotifyEvent*)&event)->selection == bufid) {
-            if (!printSelection(display, window, bufname, "image/png") &&
-                !printSelection(display, window, bufname, "image/jpeg") &&
-                !printSelection(display, window, bufname, "UTF8_STRING")) {
-                printSelection(display, window, bufname, "STRING");
+            if (event.type == event_base + XFixesSelectionNotify &&
+                ((XFixesSelectionNotifyEvent*)&event)->selection == bufid) {
+                if (!printSelection(display, window, bufname, "image/png") &&
+                    !printSelection(display, window, bufname, "image/jpeg") &&
+                    !printSelection(display, window, bufname, "UTF8_STRING")) {
+                    printSelection(display, window, bufname, "STRING");
+                }
             }
+        } else {
+            // Pequeno delay para evitar loop intenso
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
     }
 }

@@ -57,11 +57,10 @@ void HistoryManipulator::remove(int index) {
     window->updateItems(this);
 }
 
-
 void HistoryManipulator::cropData() {
     if (history.size() > 20) {
         auto it = history.begin();
-        std::advance(it, 20);
-        history.erase(it, history.end());
+        std::advance(it, history.size() - 20);
+        history.erase(history.begin(), it);
     }
 }

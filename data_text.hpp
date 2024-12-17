@@ -1,12 +1,6 @@
 #ifndef DATA_TEXT_HPP
 #define DATA_TEXT_HPP
 #include <gtkmm.h>
-#include <X11/Xlib.h>
-#include <X11/extensions/XTest.h>
-#include <X11/keysym.h>
-#include <thread>
-#include <chrono>
-
 #include <iostream>
 
 #include "data.hpp"
@@ -21,6 +15,7 @@ class Text : public Data {
     const std::string& getContent() const { return _text; };
     const std::string& getType() const override { return _type; };
     Gtk::EventBox *getEventBox() const override { return event_box; };
+    
    private:
     Gtk::EventBox *event_box;
     std::string _text;
@@ -29,6 +24,8 @@ class Text : public Data {
     std::function<void(int)> removeItem;
     std::string cleanText();
     int index;
+    void sendKey(int fd, int keycode, bool press);
+    bool wait_for_device(const char* device_path, int timeout_ms);
 };
 
 #endif // DATA_TEXT_HPP

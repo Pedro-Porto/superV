@@ -31,9 +31,20 @@ void signalHandler(int) {
 
 
 int main(int argc, char* argv[]) {
+    if (argc < 2) {
+        std::cerr << "Include path on call <path>" << std::endl;
+        return 1;
+    }
+
+    std::string path = argv[1];
+
+    if (!path.empty() && path.back() == '/') path.erase(path.size() - 1);
+
+    std::string socketPath = path + "/global_listener_socket";
+
     std::signal(SIGINT, signalHandler);
 
-    SaveConfig config("superv.conf");
+    SaveConfig config(path + "/superv.conf");
 
     bool saveToHistory = config.load("SAVE_HISTORY") == "true";
 
@@ -43,7 +54,7 @@ int main(int argc, char* argv[]) {
         std::cout << "Not saving history to file" << std::endl;
     }
 
-    auto app = Gtk::Application::create(argc, argv, "org.example.overlay");
+    auto app = Gtk::Application::create("com.example.superv");
 
     Gtk::Window dummyWindow;
     dummyWindow.set_default_size(1, 1);
@@ -55,7 +66,7 @@ int main(int argc, char* argv[]) {
 
     HistoryManipulator history(&mainWindow);
 
-    SaveHistory saveHistory("history.bin", history);
+    SaveHistory saveHistory(path + "/history.bin", history);
 
     if (saveToHistory) {
         saveHistory.load();
@@ -93,7 +104,7 @@ int main(int argc, char* argv[]) {
 
     std::thread globalKeyListenerThread(globalListener, [&]() {
         toggleDispatcher.emit();
-    }, std::ref(keepRunning));
+    }, std::ref(keepRunning), socketPath);
 
     app->signal_shutdown().connect([&]() {
         std::cout << "Shutting down application..." << std::endl;
@@ -101,16 +112,22 @@ int main(int argc, char* argv[]) {
         // stop listeners
         keepRunning = false;
 
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
         // trigger x11 event to stop loop
         Display* display = XOpenDisplay(nullptr);
         if (display) {
             Window root = DefaultRootWindow(display);
             Atom clipboard = XInternAtom(display, "CLIPBOARD", False);
             XSetSelectionOwner(display, clipboard, root, CurrentTime);
+
+            XFlush(display);
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
             XCloseDisplay(display);
         }
 
-        stopListener();
+        stopListener(socketPath);
 
         if (globalKeyListenerThread.joinable()) {
             globalKeyListenerThread.join();

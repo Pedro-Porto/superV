@@ -6,7 +6,7 @@
 #include <cstring>
 
 #define SOCKET_PATH "/tmp/global_listener_socket"
-void globalListener(std::function<void()> callback, std::atomic<bool>& runningFlag) {
+void globalListener(std::function<void()> callback, std::atomic<bool>& runningFlag, std::string socketPath) {
     int server_fd = socket(AF_UNIX, SOCK_STREAM, 0);
     if (server_fd == -1) {
         perror("Erro ao criar o socket");
@@ -15,8 +15,8 @@ void globalListener(std::function<void()> callback, std::atomic<bool>& runningFl
 
     sockaddr_un addr{};
     addr.sun_family = AF_UNIX;
-    std::strncpy(addr.sun_path, SOCKET_PATH, sizeof(addr.sun_path) - 1);
-    unlink(SOCKET_PATH);
+    std::strncpy(addr.sun_path, socketPath.c_str(), sizeof(addr.sun_path) - 1);
+    unlink(socketPath.c_str());
 
     if (bind(server_fd, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) == -1) {
         perror("Erro ao associar o socket");
@@ -27,11 +27,11 @@ void globalListener(std::function<void()> callback, std::atomic<bool>& runningFl
     if (listen(server_fd, 5) == -1) {
         perror("Erro ao escutar no socket");
         close(server_fd);
-        unlink(SOCKET_PATH);
+        unlink(socketPath.c_str());
         return;
     }
 
-    std::cout << "Global listener ativo no socket: " << SOCKET_PATH << std::endl;
+    std::cout << "Global listener ativo no socket: " << socketPath << std::endl;
 
     while (runningFlag) {
         int client_fd = accept(server_fd, nullptr, nullptr);
@@ -67,16 +67,16 @@ void globalListener(std::function<void()> callback, std::atomic<bool>& runningFl
     }
 
     close(server_fd);
-    unlink(SOCKET_PATH);
+    unlink(socketPath.c_str());
     std::cout << "Global listener encerrado." << std::endl;
 }
 
-void stopListener() {
+void stopListener(std::string socketPath) {
     int client_fd = socket(AF_UNIX, SOCK_STREAM, 0);
     if (client_fd != -1) {
         sockaddr_un addr{};
         addr.sun_family = AF_UNIX;
-        std::strncpy(addr.sun_path, SOCKET_PATH, sizeof(addr.sun_path) - 1);
+        std::strncpy(addr.sun_path, socketPath.c_str(), sizeof(addr.sun_path) - 1);
 
         connect(client_fd, reinterpret_cast<sockaddr*>(&addr), sizeof(addr));
         close(client_fd);
